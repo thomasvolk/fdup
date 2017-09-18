@@ -1,4 +1,3 @@
-
 all: unit-tests integration-test
 
 unit-tests:
