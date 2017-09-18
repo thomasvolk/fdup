@@ -2,6 +2,16 @@
 
 FDup is an command line application to find duplicate files.
 
+## Build
+
+To build fdup you need to install erlang and elixir:
+
+    $ sudo apt-get install elixir
+
+run mix to build the fdup executable:
+
+    $ mix escript.build
+
 ## Quick Start
 
 usage:
