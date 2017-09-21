@@ -3,7 +3,7 @@
 FDup is an command line application to find duplicate files.
 
 [![Coverage Status](https://coveralls.io/repos/github/thomasvolk/fdup/badge.svg?branch=master)](https://coveralls.io/github/thomasvolk/fdup?branch=master)
-[![Build Status](https://travis-ci.org/thomasvolk/fdup.svg?branch=master)](https://travis-ci.org/thomasvolk/fdup?branch=master)
+[![Build Status](https://travis-ci.org/thomasvolk/fdup.svg?branch=master)](https://travis-ci.org/thomasvolk/fdup)
 
 ## Build
 
