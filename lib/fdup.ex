@@ -16,54 +16,68 @@ defmodule FDup do
   See the License for the specific language governing permissions and
   limitations under the License.
   """
-  def main(args) do
-    args |> parse_args |> process(&IO.puts/1)
-  end
   alias FDup.Directory, as: Directory
   alias FDup.DB, as: DB
   alias FDup.Group, as: Group
 
-  def usage() do
-    IO.puts("FDup 0.1")
-    IO.puts "missing path argument!"
-    IO.puts "usage: fdup --mode [unique|duplicate] [--group level] PATH"
-    System.halt(1)
+  def main(args) do
+    return_code = main(args, &IO.puts/1)
+    System.halt(return_code)
   end
 
-  def process(%{options: _, args: []}, _), do: usage()
-
-  def process(%{options: [], args: [path]}, print) do
-    process([], "duplicate", path, print)
+  def main(args, output) do
+    result = args |> parse_args |> process(output)
+    case result do
+      { :error, msg } ->
+         output.("ERROR: " <> msg)
+         usage(output)
+         1
+      _ -> 0
+    end
   end
 
-  def process(%{options: [{:mode, mode}|options], args: [path]}, print) do
-    process(options, mode, path, print)
+  def usage(output) do
+    output.("FDup 0.1")
+    output.("usage: fdup --mode [unique|duplicate] [--group level] PATH")
   end
 
-  def process(options, mode, path, print) do
+  def process(%{options: _, args: []}, _) do
+    {:error, "missing path argument!"}
+  end
+
+  def process(%{options: [], args: [path]}, output) do
+    process([], "duplicate", path, output)
+  end
+
+  def process(%{options: [{:mode, mode}|options], args: [path]}, output) do
+    process(options, mode, path, output)
+  end
+
+  def process(options, mode, path, output) do
     Logger.debug "create index path=#{path}"
     db = Directory.traverse([path], &DB.update_from_file/2, DB.new)
     Logger.debug "generate report mode=#{mode}"
-    report(options, String.to_atom(mode), db, print)
+    report(options, String.to_atom(mode), db, output)
     Logger.debug "done"
+    {:ok, "done"}
   end
 
-  def report([{:group, level}|_], :unique, db, print) do
+  def report([{:group, level}|_], :unique, db, output) do
     %{duplicates: _, uniques: uniques} = DB.groups(db, elem(Integer.parse(level), 0))
-    Enum.each(Group.counts(uniques), fn [p, c] -> print.("#{c} #{p}") end)
+    Enum.each(Group.counts(uniques), fn [p, c] -> output.("#{c} #{p}") end)
   end
 
-  def report([], :unique, db, print) do
-    Enum.each(DB.unique_entries(db), print)
+  def report([], :unique, db, output) do
+    Enum.each(DB.unique_entries(db), output)
   end
 
-  def report([{:group, level}], :duplicate, db, print) do
+  def report([{:group, level}], :duplicate, db, output) do
     %{duplicates: duplicates, uniques: _} = DB.groups(db, elem(Integer.parse(level), 0))
-    Enum.each(Group.counts(duplicates), fn [p, c] -> print.("#{c} #{p}") end)
+    Enum.each(Group.counts(duplicates), fn [p, c] -> output.("#{c} #{p}") end)
   end
 
-  def report([], :duplicate, db, print) do
-    Enum.each(DB.duplicate_entries(db), print)
+  def report([], :duplicate, db, output) do
+    Enum.each(DB.duplicate_entries(db), output)
   end
 
   defp parse_args(args) do

@@ -13,7 +13,7 @@ defmodule FDupTest do
   doctest FDup
 
   def fdup(args, queue) do
-    FDup.process(args, fn s -> FDupTest.Queue.add(queue, s) end)
+    FDup.main(args, fn s -> FDupTest.Queue.add(queue, s) end)
     Enum.join(FDupTest.Queue.get(queue), "\n") <> "\n"
   end
 
@@ -23,14 +23,14 @@ defmodule FDupTest do
   end
 
   test "fdup unique", %{path: path, queue: queue} do
-    assert fdup(%{options: [{:mode, "unique"}], args: [path]}, queue) == """
+    assert fdup(["--mode", "unique", path], queue) == """
     test_data/1/foo.txt
     test_data/README.md
     """
   end
 
   test "fdup duplicate", %{path: path, queue: queue} do
-    assert fdup(%{options: [{:mode, "duplicate"}], args: [path]}, queue) == """
+    assert fdup(["--mode", "duplicate", path], queue) == """
     test_data/1/x.txt
     test_data/2/x.txt
     test_data/x.txt
@@ -38,13 +38,13 @@ defmodule FDupTest do
   end
 
   test "fdup unique group", %{path: path, queue: queue} do
-    assert fdup(%{options: [{:mode, "unique"}, {:group, "1"}], args: [path]}, queue) == """
+    assert fdup(["--mode", "unique", "--group", "1", path], queue) == """
     2 test_data
     """
   end
 
   test "fdup duplicate group", %{path: path, queue: queue} do
-    assert fdup(%{options: [{:mode, "duplicate"}, {:group, "1"}], args: [path]}, queue) == """
+    assert fdup(["--mode", "duplicate", "--group", "1", path], queue) == """
     3 test_data
     """
   end

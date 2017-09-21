@@ -1,7 +1,5 @@
 defmodule FDup.Directory do
 
-  def traverse(path), do: traverse(path, fn r, p -> [p|r] end, [])
-
   def traverse([ path | rest ], handler, result) do
     stat = File.stat!(path)
     case stat.type do
