@@ -6,6 +6,8 @@ defmodule FDupTest.Queue do
   def get(queue), do: Agent.get(queue, fn q -> q end)
 
   def add(queue, value), do: Agent.update(queue, fn q -> q ++ [value] end)
+
+  def handler(queue), do: fn s -> FDupTest.Queue.add(queue, s) end
 end
 
 defmodule FDupTest do
@@ -13,13 +15,32 @@ defmodule FDupTest do
   doctest FDup
 
   def fdup(args, queue) do
-    FDup.main(args, fn s -> FDupTest.Queue.add(queue, s) end)
-    Enum.join(FDupTest.Queue.get(queue), "\n") <> "\n"
+    FDup.main(args, FDupTest.Queue.handler(queue))
+    as_string(queue)
   end
+
+  def as_string(queue), do: Enum.join(FDupTest.Queue.get(queue), "\n") <> "\n"
 
   setup do
     {:ok, queue} = start_supervised FDupTest.Queue
     %{path: "test_data", queue: queue, }
+  end
+
+
+  test "fdup usage", %{path: _, queue: queue} do
+    FDup.usage(FDupTest.Queue.handler(queue))
+    assert as_string(queue) == """
+    FDup 0.1
+    usage: fdup --mode [unique|duplicate] [--group level] PATH
+    """
+  end
+
+  test "fdup default", %{path: path, queue: queue} do
+    assert fdup([path], queue) == """
+    test_data/1/x.txt
+    test_data/2/x.txt
+    test_data/x.txt
+    """
   end
 
   test "fdup unique", %{path: path, queue: queue} do
