@@ -15,8 +15,9 @@ defmodule FDupTest do
   doctest FDup
 
   def fdup(args, queue) do
-    FDup.main(args, FDupTest.Queue.handler(queue))
-    as_string(queue)
+    error_code = FDup.main(args, FDupTest.Queue.handler(queue))
+    output = as_string(queue)
+    %{output: output, error_code: error_code}
   end
 
   def as_string(queue), do: Enum.join(FDupTest.Queue.get(queue), "\n") <> "\n"
@@ -35,38 +36,46 @@ defmodule FDupTest do
     """
   end
 
+  test "fdup error", %{path: _, queue: queue} do
+    assert fdup([], queue) == %{ output: """
+    ERROR: missing path argument!
+    FDup 0.1
+    usage: fdup --mode [unique|duplicate] [--group level] PATH
+    """, error_code: 1 }
+  end
+
   test "fdup default", %{path: path, queue: queue} do
-    assert fdup([path], queue) == """
+    assert fdup([path], queue) == %{ output: """
     test_data/1/x.txt
     test_data/2/x.txt
     test_data/x.txt
-    """
+    """, error_code: 0 }
   end
 
   test "fdup unique", %{path: path, queue: queue} do
-    assert fdup(["--mode", "unique", path], queue) == """
+    assert fdup(["--mode", "unique", path], queue) == %{ output: """
     test_data/1/foo.txt
     test_data/README.md
-    """
+    """, error_code: 0 }
   end
 
   test "fdup duplicate", %{path: path, queue: queue} do
-    assert fdup(["--mode", "duplicate", path], queue) == """
+    assert fdup(["--mode", "duplicate", path], queue) == %{ output: """
     test_data/1/x.txt
     test_data/2/x.txt
     test_data/x.txt
-    """
+    """, error_code: 0 }
   end
 
   test "fdup unique group", %{path: path, queue: queue} do
-    assert fdup(["--mode", "unique", "--group", "1", path], queue) == """
+    assert fdup(["--mode", "unique", "--group", "1", path], queue) == %{ output: """
     2 test_data
-    """
+    """, error_code: 0 }
   end
 
   test "fdup duplicate group", %{path: path, queue: queue} do
-    assert fdup(["--mode", "duplicate", "--group", "1", path], queue) == """
+    assert fdup(["--mode", "duplicate", "--group", "1", path], queue) == %{ output: """
     3 test_data
-    """
+    """, error_code: 0 }
   end
 end

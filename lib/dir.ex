@@ -1,15 +1,16 @@
 defmodule FDup.Directory do
 
-  def traverse([ path | rest ], handler, result) do
+  def traverse([ path | rest ], file_consumer, result) do
     stat = File.stat!(path)
-    case stat.type do
+    { dirs, new_result } = case stat.type do
       :directory ->
-        traverse(list_dir(path) ++ rest, handler, result)
+        { list_dir(path) ++ rest, result }
       :regular ->
-        traverse(rest, handler, handler.(result, path))
+        { rest, file_consumer.(result, path) }
       _ ->
-        traverse(rest, handler, result)
+        { rest, result }
     end
+    traverse(dirs, file_consumer, new_result)
   end
 
   def traverse([], _, result), do: result
