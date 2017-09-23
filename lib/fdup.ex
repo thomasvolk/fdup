@@ -37,7 +37,8 @@ defmodule FDup do
   end
 
   def usage(output) do
-    output.("FDup 0.1")
+    output.("FDup 0.2")
+    output.("Copyright 2017 Thomas Volk")
     output.("usage: fdup --mode [unique|duplicate] [--group level] PATH")
   end
 

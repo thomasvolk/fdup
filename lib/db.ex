@@ -4,7 +4,7 @@ defmodule FDup.DB do
   end
 
   def update(data, key, entry) do
-    Map.update(data, key, [entry], &( Enum.uniq( [ entry | &1 ] ) ))
+    Map.update(data, key, [entry], &( [ entry | &1 ] |> Enum.uniq() |> Enum.sort() ))
   end
 
   def update_from_file(data, path) do
@@ -22,7 +22,7 @@ defmodule FDup.DB do
 
   def unique_entries(data), do: Map.values(data) |> Enum.filter(&(length(&1) == 1)) |> List.flatten() |> Enum.sort()
 
-  def duplicate_entries(data), do: Map.values(data) |> Enum.filter(&(length(&1) > 1)) |> List.flatten() |> Enum.sort()
+  def duplicate_entries(data), do: Map.values(data) |> Enum.filter(&(length(&1) > 1)) |> List.flatten()
 
   def groups(data, level) when level > 0 do
     uniques = FDup.Group.update(FDup.Group.new, unique_entries(data), level)
