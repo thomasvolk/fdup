@@ -30,8 +30,8 @@ Let's find all duplicates:
 
 Let's group them:
 
-    $ fdup --mode duplicate --group 1 test_data/
-    3 test_data
+    $ fdup --group --level 1 test_data/
+    u=2 d=3 : test_data
 
 ## Installation
 
