@@ -20,10 +20,7 @@ defmodule FDup do
   alias FDup.DB, as: DB
   alias FDup.Group, as: Group
 
-  def main(args) do
-    return_code = main(args, &IO.puts/1)
-    System.halt(return_code)
-  end
+  def main(args), do: System.halt(main(args, &IO.puts/1))
 
   def main(args, output) do
     result = args |> parse_args |> process(output)
