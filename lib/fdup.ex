@@ -18,7 +18,6 @@ defmodule FDup do
   """
   alias FDup.Directory, as: Directory
   alias FDup.DB, as: DB
-  alias FDup.Group, as: Group
 
   def main(args), do: System.halt(main(args, &IO.puts/1))
 
@@ -34,9 +33,9 @@ defmodule FDup do
   end
 
   def usage(output) do
-    output.("FDup 0.2")
+    output.("FDup 0.3")
     output.("Copyright 2017 Thomas Volk")
-    output.("usage: fdup --mode [unique|duplicate] [--group level] PATH")
+    output.("usage: fdup --mode [unique|duplicate|group] [--level grouping_level] PATH")
   end
 
   def process(%{options: _, args: []}, _) do
@@ -60,22 +59,21 @@ defmodule FDup do
     {:ok, "done"}
   end
 
-  def report([{:group, level}|_], :unique, db, output) do
-    %{duplicates: _, uniques: uniques} = DB.groups(db, elem(Integer.parse(level), 0))
-    Enum.each(Group.counts(uniques), fn [p, c] -> output.("#{c} #{p}") end)
-  end
-
   def report([], :unique, db, output) do
     Enum.each(DB.unique_entries(db), output)
   end
 
-  def report([{:group, level}], :duplicate, db, output) do
-    %{duplicates: duplicates, uniques: _} = DB.groups(db, elem(Integer.parse(level), 0))
-    Enum.each(Group.counts(duplicates), fn [p, c] -> output.("#{c} #{p}") end)
-  end
-
   def report([], :duplicate, db, output) do
     Enum.each(DB.duplicate_entries(db), output)
+  end
+
+  def report([{:level, level}], :group, db, output) do
+    groups = DB.groups(db, elem(Integer.parse(level), 0))
+    Map.to_list(groups) |> Enum.each(fn {p, g} ->
+      u = length(Map.get(g, :unique, []))
+      d = length(Map.get(g, :duplicate, []))
+      output.("u=#{u} d=#{d} : #{p}") 
+    end)
   end
 
   defp parse_args(args) do

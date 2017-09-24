@@ -1,7 +1,7 @@
 defmodule FDup.Group do
-  def new() do
-    Map.new
-  end
+  def new(), do: Map.new
+
+  def new(list, level), do: update(Map.new, list, level)
 
   def update(data, [path|rest], level) when level > 0 do
     key = sub_path(path, level)
@@ -13,12 +13,11 @@ defmodule FDup.Group do
 
   def paths(data), do: Map.keys(data) |> Enum.sort
 
-  def files(data, path), do: Map.get(data, path, []) |> Enum.sort
+  def merge(label, data), do: merge(Map.new, label, data)
 
-  def count(data, path), do: length(files(data, path))
-
-  def counts(data) do
-    Enum.map(paths(data), fn p -> [p, count(data, p)] end)
+  def merge(merged_map, label, data) do
+    to_merge = data |> Map.to_list |> Enum.map(fn {k,v} -> {k, {label, v}} end) |> Map.new
+    Map.merge(merged_map, to_merge, fn _k, v1, v2 -> Map.new([v1, v2]) end)
   end
 
   def sub_path(path, level) when level > 0 do

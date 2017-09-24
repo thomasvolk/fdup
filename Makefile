@@ -8,12 +8,10 @@ unit-tests:
 integration-test: compile
 	@echo "--- Duplicate: "
 	./fdup test_data
-	@echo "  - groups:"
-	./fdup test_data --mode duplicate --group 1
 	@echo "--- Unique:"
 	./fdup test_data --mode unique
-	@echo "  - groups:"
-	./fdup test_data --mode unique --group 1
+	@echo "--- Groups:"
+	./fdup test_data --mode group --level 1
 
 release: compile
 	tar cfz $(REL) fdup

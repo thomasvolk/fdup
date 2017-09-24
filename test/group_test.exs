@@ -29,4 +29,17 @@ defmodule GroupTest do
     group = update(group, ["foo.txt", "pic/33.jpg", "pic/2017/7.jpg", "pic/2008/2.jpg", "pic/test/1.jpg"], 2)
     assert paths(group) == [".", "pic", "pic/2008", "pic/2017", "pic/test"]
   end
+
+  test "merge groups" do
+    group1 = new(["foo.txt", "pic/33.jpg"], 2)
+    group2 = new(["xxx.txt", "pic/00001.jpg"], 2)
+    merged = merge(:g1, group1) |> merge(:g2, group2)
+    assert merged == %{ "." => %{g1: ["foo.txt"], g2: ["xxx.txt"]}, "pic" => %{g1: ["pic/33.jpg"], g2: ["pic/00001.jpg"]} }
+  end
+
+  test "create group" do
+    g1 = new()
+    g2 = new([], 2)
+    assert g1 == g2
+  end
 end

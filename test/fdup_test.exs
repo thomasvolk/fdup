@@ -31,18 +31,18 @@ defmodule FDupTest do
   test "fdup usage", %{path: _, queue: queue} do
     FDup.usage(FDupTest.Queue.handler(queue))
     assert as_string(queue) == """
-    FDup 0.2
+    FDup 0.3
     Copyright 2017 Thomas Volk
-    usage: fdup --mode [unique|duplicate] [--group level] PATH
+    usage: fdup --mode [unique|duplicate|group] [--level grouping_level] PATH
     """
   end
 
   test "fdup error", %{path: _, queue: queue} do
     assert fdup([], queue) == %{ output: """
     ERROR: missing path argument!
-    FDup 0.2
+    FDup 0.3
     Copyright 2017 Thomas Volk
-    usage: fdup --mode [unique|duplicate] [--group level] PATH
+    usage: fdup --mode [unique|duplicate|group] [--level grouping_level] PATH
     """, error_code: 1 }
   end
 
@@ -69,15 +69,9 @@ defmodule FDupTest do
     """, error_code: 0 }
   end
 
-  test "fdup unique group", %{path: path, queue: queue} do
-    assert fdup(["--mode", "unique", "--group", "1", path], queue) == %{ output: """
-    2 test_data
-    """, error_code: 0 }
-  end
-
-  test "fdup duplicate group", %{path: path, queue: queue} do
-    assert fdup(["--mode", "duplicate", "--group", "1", path], queue) == %{ output: """
-    3 test_data
+  test "fdup group", %{path: path, queue: queue} do
+    assert fdup(["--mode", "group", "--level", "1", path], queue) == %{ output: """
+    u=2 d=3 : test_data
     """, error_code: 0 }
   end
 end
