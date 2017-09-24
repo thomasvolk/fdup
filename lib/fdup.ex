@@ -33,7 +33,7 @@ defmodule FDup do
   end
 
   def usage(output) do
-    output.("FDup 0.4")
+    output.("FDup 0.5")
     output.("Copyright 2017 Thomas Volk")
     output.("usage: fdup --mode [unique|duplicate|group] [--level grouping_level] PATH")
   end
@@ -68,7 +68,10 @@ defmodule FDup do
   end
 
   def report(options, :group, db, output) do
-    level = Map.get(Map.new(options), "level", "1") |> Integer.parse
+    level = case options do
+      [{:level, level}|_] -> level
+      _ -> "1"
+    end |> Integer.parse
     groups = DB.grouping(db, elem(level, 0))
     Map.to_list(groups) |> Enum.each(fn {p, g} ->
       u = Map.get(g, :unique, 0)

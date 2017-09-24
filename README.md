@@ -41,7 +41,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
 ```elixir
     def deps do
-      [{:fdup, git: "https://github.com/thomasvolk/fdup.git", tag: "0.4"}]
+      [{:fdup, git: "https://github.com/thomasvolk/fdup.git", tag: "0.5"}]
     end
 ```
 
