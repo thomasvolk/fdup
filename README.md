@@ -23,15 +23,15 @@ usage:
 
 Let's find all duplicates:
 
-    $ fdup --mode duplicate test_data
+    $ fdup --mode duplicate test_data/mixed
     test_data/1/x.txt
     test_data/2/x.txt
     test_data/x.txt
 
 Let's group them:
 
-    $ fdup --group --level 1 test_data/
-    u=2 d=3 : test_data
+    $ fdup --group --level 1 test_data/mixed
+    U=2 D=3 : test_data
 
 ## Installation
 

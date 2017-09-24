@@ -67,12 +67,13 @@ defmodule FDup do
     Enum.each(DB.duplicate_entries(db), output)
   end
 
-  def report([{:level, level}], :group, db, output) do
-    groups = DB.groups(db, elem(Integer.parse(level), 0))
+  def report(options, :group, db, output) do
+    level = Map.get(Map.new(options), "level", "1") |> Integer.parse
+    groups = DB.grouping(db, elem(level, 0))
     Map.to_list(groups) |> Enum.each(fn {p, g} ->
-      u = length(Map.get(g, :unique, []))
-      d = length(Map.get(g, :duplicate, []))
-      output.("u=#{u} d=#{d} : #{p}") 
+      u = Map.get(g, :unique, 0)
+      d = Map.get(g, :duplicate, 0)
+      output.("U=#{u} D=#{d} : #{p}")
     end)
   end
 

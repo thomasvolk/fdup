@@ -24,9 +24,8 @@ defmodule FDup.DB do
 
   def duplicate_entries(data), do: Map.values(data) |> Enum.filter(&(length(&1) > 1)) |> List.flatten()
 
-  def groups(data, level) when level > 0 do
-    uniques = Group.new(unique_entries(data), level)
-    duplicates = Group.new(duplicate_entries(data), level)
-    Group.merge(:unique, uniques) |> Group.merge(:duplicate, duplicates)
+  def grouping(data, level) when level > 0 do
+    grouping = Group.update_uniques(Group.new, unique_entries(data), level)
+    Group.update_duplicates(grouping, duplicate_entries(data), level)
   end
 end

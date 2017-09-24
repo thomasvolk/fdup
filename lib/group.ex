@@ -1,24 +1,19 @@
 defmodule FDup.Group do
   def new(), do: Map.new
 
-  def new(list, level), do: update(Map.new, list, level)
+  def update_duplicates(data, duplicates, level), do: update(data, duplicates, level, :duplicate)
 
-  def update(data, [path|rest], level) when level > 0 do
+  def update_uniques(data, uniques, level), do: update(data, uniques, level, :unique)
+
+  defp update(data, [path|rest], level, tag) when level > 0 do
     key = sub_path(path, level)
-    data = Map.update(data, key, [path], &( Enum.uniq( [ path | &1 ] ) ))
-    update(data, rest, level)
+    data = Map.update(data, key, %{tag => 1}, &( increase(tag, &1) ))
+    update(data, rest, level, tag)
   end
 
-  def update(data, [], _), do: data
+  defp update(data, [], _, _), do: data
 
-  def paths(data), do: Map.keys(data) |> Enum.sort
-
-  def merge(label, data), do: merge(Map.new, label, data)
-
-  def merge(merged_map, label, data) do
-    to_merge = data |> Map.to_list |> Enum.map(fn {k,v} -> {k, {label, v}} end) |> Map.new
-    Map.merge(merged_map, to_merge, fn _k, v1, v2 -> Map.new([v1, v2]) end)
-  end
+  defp increase(tag, entry), do: Map.update(entry, tag, 1, &( &1 + 1 ))
 
   def sub_path(path, level) when level > 0 do
     dir_path = Path.dirname(path)

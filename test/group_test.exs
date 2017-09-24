@@ -23,23 +23,15 @@ defmodule GroupTest do
 
   test "group" do
     group = new()
-    group = update(group, [], 2)
-    assert paths(group) == []
+    group = update_duplicates(group, [], 2)
+    group = update_uniques(group, [], 2)
+    assert group == %{}
 
-    group = update(group, ["foo.txt", "pic/33.jpg", "pic/2017/7.jpg", "pic/2008/2.jpg", "pic/test/1.jpg"], 2)
-    assert paths(group) == [".", "pic", "pic/2008", "pic/2017", "pic/test"]
-  end
+    group = update_uniques(group, ["foo.txt", "pic/33.jpg", "pic/2017/7.jpg", "pic/2008/2.jpg", "pic/test/1.jpg"], 2)
+    assert group == %{"." => %{unique: 1}, "pic" => %{unique: 1}, "pic/2008" => %{unique: 1}, "pic/2017" => %{unique: 1}, "pic/test" => %{unique: 1} }
 
-  test "merge groups" do
-    group1 = new(["foo.txt", "pic/33.jpg"], 2)
-    group2 = new(["xxx.txt", "pic/00001.jpg"], 2)
-    merged = merge(:g1, group1) |> merge(:g2, group2)
-    assert merged == %{ "." => %{g1: ["foo.txt"], g2: ["xxx.txt"]}, "pic" => %{g1: ["pic/33.jpg"], g2: ["pic/00001.jpg"]} }
-  end
+    group = update_duplicates(group, ["xxx.txt", "yyy.txt", "pic/xxx.txt", "pic/2017/xxx.txt", "pic/yyy.txt"], 2)
+    assert group == %{"." => %{unique: 1, duplicate: 2}, "pic" => %{unique: 1, duplicate: 2}, "pic/2008" => %{unique: 1}, "pic/2017" => %{unique: 1, duplicate: 1}, "pic/test" => %{unique: 1} }
 
-  test "create group" do
-    g1 = new()
-    g2 = new([], 2)
-    assert g1 == g2
   end
 end

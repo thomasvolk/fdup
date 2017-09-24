@@ -24,7 +24,7 @@ defmodule FDupTest do
 
   setup do
     {:ok, queue} = start_supervised FDupTest.Queue
-    %{path: "test_data", queue: queue, }
+    %{path: "test_data/mixed", queue: queue, }
   end
 
 
@@ -48,30 +48,30 @@ defmodule FDupTest do
 
   test "fdup default", %{path: path, queue: queue} do
     assert fdup([path], queue) == %{ output: """
-    test_data/1/x.txt
-    test_data/2/x.txt
-    test_data/x.txt
+    test_data/mixed/1/x.txt
+    test_data/mixed/2/x.txt
+    test_data/mixed/x.txt
     """, error_code: 0 }
   end
 
   test "fdup unique", %{path: path, queue: queue} do
     assert fdup(["--mode", "unique", path], queue) == %{ output: """
-    test_data/1/foo.txt
-    test_data/README.md
+    test_data/mixed/1/foo.txt
+    test_data/mixed/README.md
     """, error_code: 0 }
   end
 
   test "fdup duplicate", %{path: path, queue: queue} do
     assert fdup(["--mode", "duplicate", path], queue) == %{ output: """
-    test_data/1/x.txt
-    test_data/2/x.txt
-    test_data/x.txt
+    test_data/mixed/1/x.txt
+    test_data/mixed/2/x.txt
+    test_data/mixed/x.txt
     """, error_code: 0 }
   end
 
   test "fdup group", %{path: path, queue: queue} do
     assert fdup(["--mode", "group", "--level", "1", path], queue) == %{ output: """
-    u=2 d=3 : test_data
+    U=2 D=3 : test_data
     """, error_code: 0 }
   end
 end
